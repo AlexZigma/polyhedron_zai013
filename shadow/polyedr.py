@@ -42,6 +42,7 @@ class Edge:
         self.beg, self.fin = beg, fin
         # Список «просветов»
         self.gaps = [Segment(Edge.SBEG, Edge.SFIN)]
+        self.is_invisible = False
 
     # Учёт тени от одной грани
     def shadow(self, facet):
@@ -64,6 +65,7 @@ class Edge:
         gaps = [s.subtraction(shade) for s in self.gaps]
         self.gaps = [
             s for s in reduce(add, gaps, []) if not s.is_degenerate()]
+        if len(self.gaps)==0: self.is_invisible = True
 
     # Преобразование одномерных координат в трёхмерные
     def r3(self, t):
@@ -85,8 +87,10 @@ class Facet:
     """ Грань полиэдра """
     # Параметры конструктора: список вершин
 
-    def __init__(self, vertexes):
+    def __init__(self, vertexes, edges):
         self.vertexes = vertexes
+        self.edges = edges
+        # self.is_invisible = True
 
     # «Вертикальна» ли грань?
     def is_vertical(self):
@@ -115,6 +119,21 @@ class Facet:
     def center(self):
         return sum(self.vertexes, R3(0.0, 0.0, 0.0)) * \
             (1.0 / len(self.vertexes))
+    
+    def area(self):
+        c = self.center()
+        s = R3.area_2d(self.vertexes[0], self.vertexes[-1], c)
+        for i in range(len(self.vertexes)-1):
+            a = self.vertexes[i]
+            b = self.vertexes[i+1]
+            s += R3.area_2d(a, b, c)
+        return s
+    
+    def is_invisible(self):
+        for e in self.edges:
+            if not e.is_invisible:
+                return False
+        return True
 
 
 class Polyedr:
@@ -154,16 +173,22 @@ class Polyedr:
                     # массив вершин этой грани
                     vertexes = list(self.vertexes[int(n) - 1] for n in buf)
                     # задание рёбер грани
+                    edges = []
                     for n in range(size):
-                        self.edges.append(Edge(vertexes[n - 1], vertexes[n]))
+                        edges.append(Edge(vertexes[n - 1], vertexes[n]))
+                    self.edges += edges
                     # задание самой грани
-                    self.facets.append(Facet(vertexes))
+                    self.facets.append(Facet(vertexes, edges))
 
     # Метод изображения полиэдра
     def draw(self, tk):
         tk.clean()
+        area = 0
         for e in self.edges:
             for f in self.facets:
                 e.shadow(f)
             for s in e.gaps:
                 tk.draw_line(e.r3(s.beg), e.r3(s.fin))
+        for f in self.facets:
+            if f.is_invisible(): area += f.area()
+        print(area, '---')
