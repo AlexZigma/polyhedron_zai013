@@ -120,20 +120,24 @@ class Facet:
         return sum(self.vertexes, R3(0.0, 0.0, 0.0)) * \
             (1.0 / len(self.vertexes))
     
-    def area(self):
+    def area(self, k):
         c = self.center()
         s = R3.area_2d(self.vertexes[0], self.vertexes[-1], c)
         for i in range(len(self.vertexes)-1):
             a = self.vertexes[i]
             b = self.vertexes[i+1]
             s += R3.area_2d(a, b, c)
-        return s
+        return s/k**2
     
     def is_invisible(self):
         for e in self.edges:
             if not e.is_invisible:
                 return False
         return True
+    
+    def is_out_os_square(self):
+        c = self.center()
+        return abs(c.x) > 0.5 and abs(c.y) > 0.5 
 
 
 class Polyedr:
@@ -146,6 +150,7 @@ class Polyedr:
 
         # списки вершин, рёбер и граней полиэдра
         self.vertexes, self.edges, self.facets = [], [], []
+        self.c = 1
 
         # список строк файла
         with open(file) as f:
@@ -154,7 +159,7 @@ class Polyedr:
                     # обрабатываем первую строку; buf - вспомогательный массив
                     buf = line.split()
                     # коэффициент гомотетии
-                    c = float(buf.pop(0))
+                    self.c = float(buf.pop(0))
                     # углы Эйлера, определяющие вращение
                     alpha, beta, gamma = (float(x) * pi / 180.0 for x in buf)
                 elif i == 1:
@@ -164,7 +169,7 @@ class Polyedr:
                     # задание всех вершин полиэдра
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes.append(R3(x, y, z).rz(
-                        alpha).ry(beta).rz(gamma) * c)
+                        alpha).ry(beta).rz(gamma) * self.c)
                 else:
                     # вспомогательный массив
                     buf = line.split()
@@ -183,12 +188,21 @@ class Polyedr:
     # Метод изображения полиэдра
     def draw(self, tk):
         tk.clean()
-        area = 0
+        invisible_area = 0
         for e in self.edges:
             for f in self.facets:
                 e.shadow(f)
             for s in e.gaps:
                 tk.draw_line(e.r3(s.beg), e.r3(s.fin))
         for f in self.facets:
-            if f.is_invisible(): area += f.area()
-        print(area, '---')
+            if f.is_out_os_square() and f.is_invisible(): invisible_area += f.area(self.c)
+        print('The area of invisible facets outside the center: ', invisible_area)
+
+    def invisible_area(self):
+        invisible_area = 0
+        for e in self.edges:
+            for f in self.facets:
+                e.shadow(f)
+        for f in self.facets:
+            if f.is_out_os_square() and f.is_invisible(): invisible_area += f.area(self.c)
+        return(invisible_area)

@@ -7,11 +7,12 @@ from shadow.polyedr import Polyedr
 
 tk = TkDrawer()
 try:
-    for name in ["my", "ccc", "cube", "box", "king", "cow"]:
+    for name in ['test6', "ccc", "cube", "box", "king", "cow"]:
         print("=============================================================")
         print(f"Начало работы с полиэдром '{name}'")
         start_time = time()
         Polyedr(f"data/{name}.geom").draw(tk)
+        # Polyedr(f"/home/alexzigma/programming/python/polyhedron/data/my.geom").draw(tk)
         delta_time = time() - start_time
         print(f"Изображение полиэдра '{name}' заняло {delta_time} сек.")
         input("Hit 'Return' to continue -> ")
