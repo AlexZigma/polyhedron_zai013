@@ -4,8 +4,6 @@ from shadow.polyedr import Polyedr
 
 class TestPolyedr:
 
-    
-
     def test_polyedr_1(self):
         assert Polyedr(f"data/test1.geom").invisible_area() == 0
 
