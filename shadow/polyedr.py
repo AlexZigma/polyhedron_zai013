@@ -88,7 +88,7 @@ class Facet:
     """ Грань полиэдра """
     # Параметры конструктора: список вершин
 
-    def __init__(self, vertexes, edges):
+    def __init__(self, vertexes, edges=[]):
         self.vertexes = vertexes
         self.edges = edges
         # self.is_invisible = True
@@ -121,7 +121,7 @@ class Facet:
         return sum(self.vertexes, R3(0.0, 0.0, 0.0)) * \
             (1.0 / len(self.vertexes))
 
-    def area(self, k):
+    def area(self, k=1):
         c = self.center()
         s = R3.area_2d(self.vertexes[0], self.vertexes[-1], c)
         for i in range(len(self.vertexes)-1):
@@ -186,26 +186,23 @@ class Polyedr:
                     # задание самой грани
                     self.facets.append(Facet(vertexes, edges))
 
+    def make_shadows(self):
+        for e in self.edges:
+            for f in self.facets:
+                e.shadow(f)
+
     # Метод изображения полиэдра
     def draw(self, tk):
         tk.clean()
-        invisible_area = 0
+        self.make_shadows()
         for e in self.edges:
-            for f in self.facets:
-                e.shadow(f)
             for s in e.gaps:
                 tk.draw_line(e.r3(s.beg), e.r3(s.fin))
-        for f in self.facets:
-            if f.is_out_os_square() and f.is_invisible():
-                invisible_area += f.area(self.c)
         print('The area of invisible facets outside the center: ',
-              invisible_area)
+              self.invisible_area())
 
     def invisible_area(self):
         invisible_area = 0
-        for e in self.edges:
-            for f in self.facets:
-                e.shadow(f)
         for f in self.facets:
             if f.is_out_os_square() and f.is_invisible():
                 invisible_area += f.area(self.c)
