@@ -96,7 +96,8 @@ class TestFacet:
         assert f.area() == approx(4.5)
 
     def test_area_3(self):
-        f = Facet([R3(0.0, 0.0, 0.0), R3(3.0, 0.0, 0.0), R3(0.0, 3.0, 0.0), R3(3, 3, 3)])
+        f = Facet([R3(0.0, 0.0, 0.0), R3(3.0, 0.0, 0.0),
+                   R3(0.0, 3.0, 0.0), R3(3, 3, 3)])
         assert f.area() == approx(4.5)
 
         # python3 -B -m pytest -p no:cacheprovider tests/test_facet.py

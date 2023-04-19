@@ -41,10 +41,11 @@ class R3:
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x)
-    
+
     @staticmethod
     def area_2d(a, b, c):
-        return abs(0.5 * ((a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)))
+        return abs(0.5 * ((a.x - c.x) * (b.y - c.y) -
+                          (a.y - c.y) * (b.x - c.x)))
 
 
 if __name__ == "__main__":
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     # print("u", type(u), u)
     # v = x.cross(y)
     # print("v", type(v), v.__dict__)
-    a = R3(0,0,-100)
-    b = R3(-100,-100,-100)
-    c = R3(100,-100,-100)
-    print(R3.area_2d(a,b,c))
+    a = R3(0, 0, -100)
+    b = R3(-100, -100, -100)
+    c = R3(100, -100, -100)
+    print(R3.area_2d(a, b, c))

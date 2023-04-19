@@ -2,6 +2,7 @@ from pytest import approx
 from math import sqrt
 from shadow.polyedr import Polyedr
 
+
 class TestPolyedr:
 
     def test_polyedr_1(self):
@@ -14,7 +15,8 @@ class TestPolyedr:
         assert Polyedr(f"data/test3.geom").invisible_area() == 1
 
     def test_polyedr_4(self):
-        assert Polyedr(f"data/test4.geom").invisible_area() == approx(sqrt(2)/2)
+        assert Polyedr(f"data/test4.geom").invisible_area() == \
+            approx(sqrt(2)/2)
 
     def test_polyedr_5(self):
         assert Polyedr(f"data/test5.geom").invisible_area() == 2
